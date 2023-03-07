@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: patgateway
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: patient-service
+          uri: lb://patient
+          predicates:
+            - Path=/api/patient/**
+          filters:
+            - StripPrefix=1
+        - id: practitioner-service
+          uri: lb://practitioner
+          predicates:
+            - Path=/api/practitioner/**
+          filters:
+            - StripPrefix=1
+        - id: appointment-service
+          uri: lb://appointment
+          predicates:
+            - Path=/api/appointment/**
+          filters:
+            - StripPrefix=1
+        - id: abc-jwt
+          uri: lb://jwtservice
+          predicates:
+            - Path=/api/jwt/**
+          filters:
+            - StripPrefix=1
+    loadbalancer:
+      ribbon:
+        enabled: false
